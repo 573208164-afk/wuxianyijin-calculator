@@ -75,6 +75,9 @@ export async function calculateContributions(cityName: string) {
       return { success: false, error: '未找到该城市的社保标准' };
     }
 
+    // 明确指定 city 类型，避免 TypeScript 推断问题
+    const cityData: City = city as any;
+
     // 3. 按员工分组计算平均工资
     const employeeGroups = new Map<string, number[]>();
     salaries?.forEach((salary: Salary) => {
@@ -93,20 +96,20 @@ export async function calculateContributions(cityName: string) {
 
       // 确定缴费基数
       let contributionBase: number;
-      if (avgSalary < city.base_min) {
-        contributionBase = city.base_min;
-      } else if (avgSalary > city.base_max) {
-        contributionBase = city.base_max;
+      if (avgSalary < cityData.base_min) {
+        contributionBase = cityData.base_min;
+      } else if (avgSalary > cityData.base_max) {
+        contributionBase = cityData.base_max;
       } else {
         contributionBase = avgSalary;
       }
 
       // 计算公司缴纳金额
-      const companyFee = contributionBase * city.rate;
+      const companyFee = contributionBase * cityData.rate;
 
       results.push({
         employee_name: employeeName,
-        city_name: city.city_name,
+        city_name: cityData.city_name,
         avg_salary: Number(avgSalary.toFixed(2)),
         contribution_base: Number(contributionBase.toFixed(2)),
         company_fee: Number(companyFee.toFixed(2)),

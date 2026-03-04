@@ -16,11 +16,9 @@ export default function UploadPage() {
 
   const loadCities = async () => {
     const { cities: citiesData } = await getCities();
-    if (citiesData) {
-      setCities(citiesData);
-      if (citiesData.length > 0) {
-        setSelectedCity(citiesData[0].city_name);
-      }
+    if (citiesData && citiesData.length > 0) {
+      setCities(citiesData as any[]);
+      setSelectedCity((citiesData[0] as any).city_name);
     }
   };
 

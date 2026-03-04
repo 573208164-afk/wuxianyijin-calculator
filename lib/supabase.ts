@@ -1,26 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 
-let supabaseInstance: ReturnType<typeof createClient> | null = null;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
+// 延迟初始化Supabase客户端，避免构建时错误
 function getSupabaseClient() {
-  if (!supabaseInstance) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Supabase环境变量未配置，请检查 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY');
-    }
-
-    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase环境变量未配置，请检查 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY');
   }
-  return supabaseInstance;
+  return createClient(supabaseUrl, supabaseAnonKey);
 }
 
 // 数据库操作函数
 export const db = {
   // Cities 表操作
   async getCities() {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('cities')
       .select('*')
       .order('city_name');
@@ -28,7 +24,8 @@ export const db = {
   },
 
   async getCityByName(cityName: string) {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('cities')
       .select('*')
       .eq('city_name', cityName)
@@ -37,7 +34,8 @@ export const db = {
   },
 
   async insertCity(city: any) {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('cities')
       .insert(city)
       .select();
@@ -45,15 +43,16 @@ export const db = {
   },
 
   async insertCities(cities: any[]) {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('cities')
-      .insert(cities)
-      .select();
+      .insert(cities as any);
     return { data, error };
   },
 
   async clearCities() {
-    const { error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { error } = await client
       .from('cities')
       .delete()
       .neq('id', 0);
@@ -62,7 +61,8 @@ export const db = {
 
   // Salaries 表操作
   async getSalaries() {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('salaries')
       .select('*')
       .order('employee_name');
@@ -70,7 +70,8 @@ export const db = {
   },
 
   async insertSalary(salary: any) {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('salaries')
       .insert(salary)
       .select();
@@ -78,15 +79,16 @@ export const db = {
   },
 
   async insertSalaries(salaries: any[]) {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('salaries')
-      .insert(salaries)
-      .select();
+      .insert(salaries as any);
     return { data, error };
   },
 
   async clearSalaries() {
-    const { error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { error } = await client
       .from('salaries')
       .delete()
       .neq('id', 0);
@@ -95,7 +97,8 @@ export const db = {
 
   // Results 表操作
   async getResults() {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('results')
       .select('*')
       .order('employee_name');
@@ -103,7 +106,8 @@ export const db = {
   },
 
   async insertResult(result: any) {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('results')
       .insert(result)
       .select();
@@ -111,15 +115,16 @@ export const db = {
   },
 
   async insertResults(results: any[]) {
-    const { data, error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { data, error } = await client
       .from('results')
-      .insert(results)
-      .select();
+      .insert(results as any);
     return { data, error };
   },
 
   async clearResults() {
-    const { error } = await getSupabaseClient()
+    const client = getSupabaseClient();
+    const { error } = await client
       .from('results')
       .delete()
       .neq('id', 0);
