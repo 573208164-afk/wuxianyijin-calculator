@@ -1,15 +1,26 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+function getSupabaseClient() {
+  if (!supabaseInstance) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Supabase环境变量未配置，请检查 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY');
+    }
+
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  return supabaseInstance;
+}
 
 // 数据库操作函数
 export const db = {
   // Cities 表操作
   async getCities() {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('cities')
       .select('*')
       .order('city_name');
@@ -17,7 +28,7 @@ export const db = {
   },
 
   async getCityByName(cityName: string) {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('cities')
       .select('*')
       .eq('city_name', cityName)
@@ -26,7 +37,7 @@ export const db = {
   },
 
   async insertCity(city: any) {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('cities')
       .insert(city)
       .select();
@@ -34,7 +45,7 @@ export const db = {
   },
 
   async insertCities(cities: any[]) {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('cities')
       .insert(cities)
       .select();
@@ -42,7 +53,7 @@ export const db = {
   },
 
   async clearCities() {
-    const { error } = await supabase
+    const { error } = await getSupabaseClient()
       .from('cities')
       .delete()
       .neq('id', 0);
@@ -51,7 +62,7 @@ export const db = {
 
   // Salaries 表操作
   async getSalaries() {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('salaries')
       .select('*')
       .order('employee_name');
@@ -59,7 +70,7 @@ export const db = {
   },
 
   async insertSalary(salary: any) {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('salaries')
       .insert(salary)
       .select();
@@ -67,7 +78,7 @@ export const db = {
   },
 
   async insertSalaries(salaries: any[]) {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('salaries')
       .insert(salaries)
       .select();
@@ -75,7 +86,7 @@ export const db = {
   },
 
   async clearSalaries() {
-    const { error } = await supabase
+    const { error } = await getSupabaseClient()
       .from('salaries')
       .delete()
       .neq('id', 0);
@@ -84,7 +95,7 @@ export const db = {
 
   // Results 表操作
   async getResults() {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('results')
       .select('*')
       .order('employee_name');
@@ -92,7 +103,7 @@ export const db = {
   },
 
   async insertResult(result: any) {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('results')
       .insert(result)
       .select();
@@ -100,7 +111,7 @@ export const db = {
   },
 
   async insertResults(results: any[]) {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('results')
       .insert(results)
       .select();
@@ -108,7 +119,7 @@ export const db = {
   },
 
   async clearResults() {
-    const { error } = await supabase
+    const { error } = await getSupabaseClient()
       .from('results')
       .delete()
       .neq('id', 0);
